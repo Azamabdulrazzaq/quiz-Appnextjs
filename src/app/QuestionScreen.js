@@ -68,12 +68,6 @@ const QuestionScreen = ({ name }) => {
         setCurrentAnswer(answers)
         setSelectedAnswerIndex(index)
         setIsChecked(true)
-        if (answers == answer) {
-            setCurrentAnswer(true)
-        }
-        else {
-            setCurrentAnswer(false)
-        }
     }
 
     const nextQuestions = () => {
