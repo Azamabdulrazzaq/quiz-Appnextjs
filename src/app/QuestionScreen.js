@@ -9,7 +9,7 @@ const QuestionScreen = ({ name }) => {
     const [isChecked, setIsChecked] = useState(false)
     const [showResult, setShowResult] = useState(false)
     const [seconds, setSeconds] = useState(0)
-    const [minutes, setMinutes] = useState(Math.floor(time))
+    const [minutes, setMinutes] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
     const [elapsedTime, setElapsedTime] = useState(0)
     const [visible, setVisible] = useState(false)
@@ -17,7 +17,7 @@ const QuestionScreen = ({ name }) => {
     const [quizResult, setQuizResult] = useState({
         score: 0,
         correctAnswer: 0,
-        inCorectAnswer: 0,
+        inCorrectAnswer: 0,
         totalTime: 0
     })
 
@@ -30,38 +30,44 @@ const QuestionScreen = ({ name }) => {
     }
 
     const formatTime = (time) => {
-        const minute = Math.floor(time / 60);
-        setMinutes(minute)
-        console.log(minute)
-        const second = time % 60;
-        setSeconds(second)
-        console.log(second)
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
         return `${addLeadingZero(minutes)} : ${addLeadingZero(seconds)}`
     }
 
-    const startTimer = (time) => {
-        const timeRemaining = time * 60;
-        const interval = setInterval(() => {
-            if (!isPaused) {
-                timeRemaining--
-                setElapsedTime(elapsedTime + 1)
+    // const startTimer = (time) => {
+    //     const timeRemaining = time * 60;
+    //     const interval = setInterval(() => {
+    //         if (!isPaused) {
+    //             timeRemaining--
+    //             setElapsedTime(elapsedTime + 1)
 
-                if (timeRemaining <= 0) {
-                    clearInterval(interval)
-                    setVisible(true)
-                }
+    // if (timeRemaining <= 0) {
+    //     clearInterval(interval)
+    //     setVisible(true)
+    // }
 
-            } else {
-                formatTime(timeRemaining)
-            }
-        }, 1000)
-        return interval
-    }
+    //         } else {
+    //             formatTime(timeRemaining)
+    //         }
+    //     }, 1000)
+    //     return interval
+    // }
 
     useEffect(() => {
-        const interval = startTimer();
-        return () => clearInterval(interval);
-    }, [isPaused])
+
+        if (!isPaused && !showResult) {
+            timerRef.current = setInterval(() => {
+                setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
+            }, 1000);
+        }
+        return () => clearInterval(timerRef.current);
+    }, [isPaused, showResult])
+
+    useEffect(() => {
+        setMinutes(Math.floor(elapsedTime / 60));
+        setSeconds(elapsedTime % 60)
+    }, [elapsedTime]);
 
 
     const onSelectedAnswer = (answers, index) => {
@@ -81,7 +87,7 @@ const QuestionScreen = ({ name }) => {
         else {
             setQuizResult((prev) => ({
                 ...prev,
-                inCorectAnswer: prev.inCorectAnswer + 1
+                inCorrectAnswer: prev.inCorrectAnswer + 1
             }))
         }
 
@@ -90,6 +96,11 @@ const QuestionScreen = ({ name }) => {
         }
         else {
             setShowResult(true)
+            setQuizResult((prev) => ({
+                ...prev,
+                totalTime: elapsedTime, // Save the total time spent on the quiz
+            }))
+            clearInterval(timerRef.current); // Stop the timer when quiz ends
         }
         setCurrentAnswer("");
         setSelectedAnswerIndex(null)
@@ -102,6 +113,7 @@ const QuestionScreen = ({ name }) => {
                 <h2 className='text'>
                     {activeQuestions + 1}/
                     <span>{questions.length}</span>
+                    <p>Time: {formatTime(elapsedTime)}</p>
                 </h2>
             </div>
             <div className={"question-container"}>
@@ -135,7 +147,13 @@ const QuestionScreen = ({ name }) => {
                             )}
                         </div>
                     </div>
-                ) : (<div className='quiz-container2'></div>)}
+                ) : (<div className='quiz-container2'>
+                    <h1>Results</h1>
+                    <p>Score: {quizResult.score}</p>
+                    <p>Correct Answers: {quizResult.correctAnswer}</p>
+                    <p>Incorrect Answers: {quizResult.inCorrectAnswer}</p>
+                    <p>Total Time Spent: {formatTime(quizResult.totalTime)}</p>
+                </div>)}
             </div>
         </div>
     )

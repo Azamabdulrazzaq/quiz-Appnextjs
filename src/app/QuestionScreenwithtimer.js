@@ -60,7 +60,8 @@ const QuestionScreen = ({ name }) => {
                 score: prev.score + 5,
                 correctAnswer: prev.correctAnswer + 1
             }));
-        } else {
+        } 
+        else {
             setQuizResult((prev) => ({
                 ...prev,
                 inCorectAnswer: prev.inCorectAnswer + 1

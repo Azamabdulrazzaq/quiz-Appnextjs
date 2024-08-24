@@ -46,12 +46,17 @@ import React from 'react'
 import AdminPanel from '../app/component/AdminPanel'
 import AdminPanelDrawer from '../app/component/AdminPanelDrawer'
 import QuestionScreen from '../app/QuestionScreenwithtimer'
+import TimeCheck from '../app/timetester'
+import NewTimer from '../app/QuestionScreen'
 
 const page = () => {
+
   return (
     // <div><AdminPanel /></div>
     // <div><AdminPanelDrawer /></div>
-    <div><QuestionScreen /></div>
+    // <div><QuestionScreen /></div>
+    // <div><TimeCheck /></div>
+    <div><NewTimer /></div>
   )
 }
 
