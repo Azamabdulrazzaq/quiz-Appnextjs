@@ -13,6 +13,7 @@ const QuestionScreen = ({ name }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [elapsedTime, setElapsedTime] = useState(0)
     const [visible, setVisible] = useState(false)
+    const [timeExpire, setTimeExpire] = useState(false)
     const timerRef = useRef(null)
     const [quizResult, setQuizResult] = useState({
         score: 0,
@@ -26,7 +27,7 @@ const QuestionScreen = ({ name }) => {
     console.log(questions[activeQuestions])
 
     const addLeadingZero = (number) => {
-        return number < 10 ? number : 0 + number
+        return number < 10 ? "0" + number : number
     }
 
     const formatTime = (time) => {
@@ -56,13 +57,23 @@ const QuestionScreen = ({ name }) => {
 
     useEffect(() => {
 
-        if (!isPaused && !showResult) {
+        if (!isPaused && !showResult && !timeExpire) {
             timerRef.current = setInterval(() => {
                 setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
             }, 1000);
         }
+
+        if (elapsedTime >= 600) {
+            clearInterval(timerRef.current)
+            setTimeExpire(true)
+            setShowResult(true)
+            setQuizResult((prev) => ({
+                ...prev,
+                totalTime: elapsedTime
+            }))
+        }
         return () => clearInterval(timerRef.current);
-    }, [isPaused, showResult])
+    }, [isPaused, showResult, elapsedTime, timeExpire])
 
     useEffect(() => {
         setMinutes(Math.floor(elapsedTime / 60));
